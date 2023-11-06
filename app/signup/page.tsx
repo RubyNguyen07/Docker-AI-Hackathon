@@ -9,10 +9,6 @@ export default function Signup({
   searchParams: { message: string }
 }) {
 
-    const signIn = async () => {
-        return redirect('/login')
-    }
-
     const signUp = async (formData: FormData) => {
         'use server'
     
