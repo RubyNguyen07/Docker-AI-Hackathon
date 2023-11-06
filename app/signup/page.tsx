@@ -3,36 +3,42 @@ import { headers, cookies } from 'next/headers'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
-export default function Login({
+export default function Signup({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
-  const signIn = async (formData: FormData) => {
-    'use server'
 
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      return redirect('/login?message=Could not authenticate user')
-    }
-
-    return redirect('/')
-  }
+    const signUp = async (formData: FormData) => {
+        'use server'
+    
+        const origin = headers().get('origin')
+        const email = formData.get('email') as string
+        const password = formData.get('password') as string
+        const cookieStore = cookies()
+        const supabase = createClient(cookieStore)
+    
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${origin}/auth/callback`,
+          },
+        })
+    
+        if (error) {
+          return redirect(`/signup?message=Could not create new account for user because ${error.message}`)
+        }
+    
+        return redirect('/login?message=Check email to continue sign in process')
+      }
 
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
+    
       <form
         className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
-        action={signIn}
+        action={signUp}
       >
         <label className="text-md" htmlFor="email">
           Email
@@ -53,8 +59,8 @@ export default function Login({
           placeholder="••••••••"
           required
         />
-        <button className="btn btn-active btn-primary">
-          Sign In
+        <button className="btn btn-primary">
+          Sign Up
         </button>
         {searchParams?.message && (
           <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
@@ -62,10 +68,9 @@ export default function Login({
           </p>
         )}
       </form>
-
-      <button className="btn btn-active btn-primary">
-        <Link href="/signup" >
-          Sign Up
+      <button className="btn btn-primary">
+        <Link href="/login">
+          Sign In
         </Link>
       </button>
     </div>
