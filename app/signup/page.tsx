@@ -68,15 +68,11 @@ export default function Signup({
           </p>
         )}
       </form>
-        <button
-          className="btn btn-primary"
-        >
-            <Link
-            href="/login"
-        >
+      <button className="btn btn-primary">
+        <Link href="/login">
           Sign In
-          </Link>
-        </button>
+        </Link>
+      </button>
     </div>
   )
 }

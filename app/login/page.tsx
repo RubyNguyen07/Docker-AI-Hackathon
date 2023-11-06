@@ -62,15 +62,12 @@ export default function Login({
           </p>
         )}
       </form>
-      <button 
-        className="btn btn-active btn-primary"
-        >
-        <Link
-            href="/signup"
-        >
+
+      <button className="btn btn-active btn-primary">
+        <Link href="/signup" >
           Sign Up
-          </Link>
-        </button>
+        </Link>
+      </button>
     </div>
   )
 }
