@@ -19,11 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={GeistSans.className}>
       <body className="bg-background text-foreground">
-        <nav className="flex items-center justify-between w-full h-16 px-8 bg-primary">
+        <nav className="flex items-center justify-between w-full h-16 px-8 bg-primary overflow-hidden">
           Hello
         </nav>
-        <main className="min-h-screen flex flex-col items-center">
-          <div className="w-full max-w-3xl">{children}</div>
+        <main className="flex flex-col items-center">
+          <div className="w-full max-w-3xl px-2 py-4">{children}</div>
         </main>
       </body>
     </html>
