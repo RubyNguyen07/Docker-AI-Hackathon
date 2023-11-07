@@ -4,3 +4,4 @@ uvicorn
 pandas
 jupyter
 lanarky
+langchainhub
