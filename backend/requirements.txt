@@ -1,0 +1,7 @@
+langchain
+fastapi
+uvicorn
+pandas
+jupyter
+lanarky
+langchainhub
