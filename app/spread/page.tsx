@@ -1,40 +1,60 @@
 "use client";
 import { useEffect, useState } from "react";
+import ChatDisplay, { Chat, Card, DrawChat } from "@/components/ChatDisplay";
 
 type Props = {};
 
-interface Chat {
-  role: "user" | "machine";
-  message: string;
-  options?: string[];
-}
+const FIRST_MESSAGE: Chat = {
+  role: "machine",
+  type: "text",
+  message: "What do you want to enquire about?",
+  options: [
+    "How is my love life in the next year?",
+    "What are some advices for my career?",
+    "What are some things I should look out for?",
+  ],
+};
+
+const getSecondMessage = (cards: Card[]) =>
+  ({
+    role: "machine",
+    type: "draw",
+    message: "Draw 3 cards",
+    cards,
+  } as DrawChat);
 
 function TarotReading({}: Props) {
-  const [conversation, setConversation] = useState<Chat[]>([
-    {
-      role: "machine",
-      message: "What do you want to enquire about? For e.g.",
-      options: [
-        "How is love life in the next year?",
-        "What are some advices for my career?",
-        "What are some things I should look out for?",
-      ],
-    },
-    {
-      role: "user",
-      message: "Lorem Ipsum Dolor",
-    },
-  ]);
+  const [conversation, setConversation] = useState<Chat[]>([FIRST_MESSAGE]);
 
   const [message, setMessage] = useState("");
   const [messageLoading, setMessageLoading] = useState(false);
+  const [cards, setCards] = useState<Card[]>([]);
+
+  useEffect(() => {
+    const fetchCards = async () => {
+      const cards = await fetch("/draw").then((res) => res.json());
+      setCards(cards);
+    };
+    fetchCards();
+  }, []);
+
+  const handleDrawCards = async () => {
+    const secondMessage = getSecondMessage(cards);
+    console.log(cards);
+    setConversation((conversation) => [...conversation, secondMessage]);
+  };
 
   const handleFetchResponse = async (message: string) => {
+    if (conversation.length <= 2) {
+      handleDrawCards();
+      return;
+    }
     setTimeout(() => {
       setConversation((conversation) => [
         ...conversation,
         {
           role: "machine",
+          type: "text",
           message: `Roger that! You said: ${message}`,
         },
       ]);
@@ -50,6 +70,7 @@ function TarotReading({}: Props) {
       ...conversation,
       {
         role: "user",
+        type: "text",
         message,
       },
     ]);
@@ -69,45 +90,23 @@ function TarotReading({}: Props) {
 
   return (
     <div className=" w-full">
-      <h1>Hello</h1>
-      <div className="conversation py-4 max-h-[500px] overflow-y-scroll">
-        {conversation.map((item, index) => {
-          return (
-            <div
-              key={index}
-              className={`chat ${
-                item.role === "machine" ? "chat-start" : "chat-end"
-              }`}
-            >
-              <div className="chat-bubble">
-                {item.message}
-                {item.role == "machine" && item.options?.length && (
-                  <div className="flex flex-wrap gap-2 my-4">
-                    {item.options?.map((option, i) => {
-                      return (
-                        <button
-                          key={i}
-                          className="btn btn-outline btn-xs normal-case"
-                        >
-                          {option}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+      <div className="flex items-center justify-center">
+        <button className="btn btn-primary">Start Reading</button>
       </div>
 
+      <ChatDisplay
+        conversation={conversation}
+        setMessage={setMessage}
+        cards={cards}
+      />
+
       <form
-        className="h-24 sticky bottom-4 left-4 right-4 flex gap-2"
+        className="h-24 sticky bottom-4 left-4 right-4 flex items-end gap-2"
         onSubmit={handleSendMessage}
       >
         <textarea
-          placeholder="Bio"
-          className="textarea textarea-bordered resize-none w-full"
+          placeholder="Your message"
+          className="textarea textarea-bordered resize-none w-full h-full"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         ></textarea>
